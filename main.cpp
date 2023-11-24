@@ -68,7 +68,7 @@ vector<int> vectorSum(const vector<int>& vec1, const vector<int>& vec2) {
 vector<int> vectorSub(const vector<int>& vec1, const vector<int>& vec2) {
     // Check if the vectors have the same size
     if (vec1.size() != vec2.size()) {
-        cerr << "Error: Vectors must have the same size for summation." << endl;
+        cerr << "Error: Vectors must have the same size for substraction." << endl;
         return vector<int>();  // Return an empty vector indicating an error
     }
 
