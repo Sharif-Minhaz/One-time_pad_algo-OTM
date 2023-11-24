@@ -19,7 +19,7 @@ string toLowerCase(string text) {
 }
 
 vector<int> getAlphabetNumber(const string& text) {
-    std::vector<int> resArr(text.length(), 0);  // Initialize vector with zeros
+    vector<int> resArr(text.length(), 0);  // Initialize vector with zeros
 
     for (size_t i = 0; i < text.length(); i++) {
         for (int j = 0; j < 26; j++) {
@@ -60,10 +60,10 @@ vector<int> rangeFixer(const vector<int>& vec) {
         int value = vec[i];
 
         if (value > 26) {
-            float res = ((value / 26) - 1) * 26;
-            result[i] = res;  // TODO: logical error
+            float res = ((value / 26.0) - 1) * 26;
+            result[i] = res;
         } else if (value < 1) {
-            float res = value + (ceil(abs(value) / 26) * 26);
+            float res = value + (ceil(abs(value) / 26.0) * 26);
             result[i] = res;
         } else {
             result[i] = value;
@@ -73,16 +73,41 @@ vector<int> rangeFixer(const vector<int>& vec) {
     return result;
 }
 
-int main() {
+string getCipherText(const vector<int>& vec) {
+    vector<char> charsPart;
+
+    for (int index : vec) {
+        // Check if the index is within the valid range of the alphabets array
+        if (index >= 0 && index < 26) {
+            charsPart.push_back(alphabets[index - 1]);
+        } else {
+            cerr << "Error: Out of range";
+        }
+    }
+
+    // Convert the character vector to a string
+    string result(charsPart.begin(), charsPart.end());
+
+    return result;
+}
+
+void printIntVector(vector<int>& vec) {
+    for (size_t i = 0; i < vec.size(); i++) {
+        cout << vec[i] << " ";
+    }
+    cout << endl;
+}
+
+void oneTimePadEncryption() {
     string plainTextInput = "APPLE", keyInput = "ELEPHANT";
 
     // user input for plaintext
-    // cout << "Enter the plain text: ";
-    // cin >> plainText;
+    cout << "Enter the plain text: ";
+    cin >> plainTextInput;
 
     // user input for key
-    // cout << "Enter key: ";
-    // cin >> key;
+    cout << "Enter key: ";
+    cin >> keyInput;
 
     string plainText = toLowerCase(plainTextInput);
     string key = toLowerCase(keyInput);
@@ -105,10 +130,58 @@ int main() {
     vector<int> summation = vectorSum(plainTextNum, keyNum);
     vector<int> fixedRange = rangeFixer(summation);
 
-    cout << plainText << " " << key << " ";
+    string cipherText = getCipherText(fixedRange);
 
-    for (size_t i = 0; i < fixedRange.size(); i++) {
-        std::cout << fixedRange[i] << " ";
+    cout << endl
+         << "P: " << plainText << endl;
+    cout << "P1: ";
+    printIntVector(plainTextNum);
+
+    cout << "K: " << key << endl;
+    cout << "K1: ";
+    printIntVector(keyNum);
+
+    cout << "Ci: ";
+    printIntVector(summation);
+
+    cout << "C1: ";
+    printIntVector(fixedRange);
+
+    cout << "(C) Ciphertext: " << cipherText;
+}
+
+void oneTimePadDecryption() {
+}
+
+int main() {
+    int choice = 1;
+    cout << "Choose operation: " << endl;
+    cout << "-> Encryption (1)" << endl;
+    cout << "-> Decryption (2)" << endl;
+
+    try {
+        cout << "Your answer: ";
+        cin >> choice;
+        cout << endl;
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+    }
+
+    if (choice > 2 || choice < 1) {
+    }
+
+    switch (choice) {
+        case 1:
+            cout << "<---One Time Pad Encryption--->" << endl;
+            oneTimePadEncryption();
+            break;
+        case 2:
+            cout << "<---One Time Pad Decryption--->" << endl;
+            oneTimePadDecryption();
+            break;
+        default:
+            cout << "Invalid choice" << endl;
+            break;
     }
 
     return 0;
