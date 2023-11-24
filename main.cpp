@@ -2,6 +2,8 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <limits>
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -16,6 +18,18 @@ string toLowerCase(string text) {
     }
 
     return str;
+}
+
+string removeSpaces(string str) {
+    std::string result;
+
+    for (char c : str) {
+        if (c != ' ') {
+            result += c;
+        }
+    }
+
+    return result;
 }
 
 vector<int> getAlphabetNumber(const string& text) {
@@ -51,6 +65,24 @@ vector<int> vectorSum(const vector<int>& vec1, const vector<int>& vec2) {
     return result;
 }
 
+vector<int> vectorSub(const vector<int>& vec1, const vector<int>& vec2) {
+    // Check if the vectors have the same size
+    if (vec1.size() != vec2.size()) {
+        cerr << "Error: Vectors must have the same size for summation." << endl;
+        return vector<int>();  // Return an empty vector indicating an error
+    }
+
+    // Create a new vector to store the result
+    vector<int> result(vec1.size(), 0);
+
+    // Perform vector summation
+    for (size_t i = 0; i < vec1.size(); i++) {
+        result[i] = vec1[i] - vec2[i];
+    }
+
+    return result;
+}
+
 vector<int> rangeFixer(const vector<int>& vec) {
     // Create a new vector to store the result
     vector<int> result(vec.size(), 0);
@@ -60,10 +92,10 @@ vector<int> rangeFixer(const vector<int>& vec) {
         int value = vec[i];
 
         if (value > 26) {
-            float res = ((value / 26.0) - 1) * 26;
+            float res = ((value / 26.0) - 1) * 26;  // overflow handling 26<
             result[i] = res;
         } else if (value < 1) {
-            float res = value + (ceil(abs(value) / 26.0) * 26);
+            float res = value + (ceil(abs(value) / 26.0) * 26);  // underflow handling <1
             result[i] = res;
         } else {
             result[i] = value;
@@ -98,19 +130,28 @@ void printIntVector(vector<int>& vec) {
     cout << endl;
 }
 
-void oneTimePadEncryption() {
-    string plainTextInput = "APPLE", keyInput = "ELEPHANT";
+int oneTimePadEncryption() {
+    string plainTextInput = "", keyInput = "";
 
     // user input for plaintext
     cout << "Enter the plain text: ";
-    cin >> plainTextInput;
+    getline(cin, plainTextInput);
+
+    while (plainTextInput.empty()) {
+        getline(cin, plainTextInput);
+    }
 
     // user input for key
-    cout << "Enter key: ";
-    cin >> keyInput;
+    cout << "Enter the key: ";
+    getline(cin, keyInput);
 
-    string plainText = toLowerCase(plainTextInput);
-    string key = toLowerCase(keyInput);
+    string plainText = removeSpaces(toLowerCase(plainTextInput));
+    string key = removeSpaces(toLowerCase(keyInput));
+
+    if (plainText.length() == 0 || key.length() == 0) {
+        cout << "Plain text and key both required." << endl;
+        return 0;
+    }
 
     // if the plain text's length is greater than key's length, then the key will be repeated
     if (key.length() < plainText.length()) {
@@ -121,15 +162,19 @@ void oneTimePadEncryption() {
         }
     }
 
-    // slicing out the overflow string
+    // slicing out the overflow string from key, exact key length will be plain text's length
     key = key.substr(0, plainText.length());
 
     // get alphabet number from the string
     vector<int> plainTextNum = getAlphabetNumber(plainText), keyNum = getAlphabetNumber(key);
 
+    // get summation of plain text vector and key text vector
     vector<int> summation = vectorSum(plainTextNum, keyNum);
+
+    // handling overflow and underflow
     vector<int> fixedRange = rangeFixer(summation);
 
+    // getting final cipherText
     string cipherText = getCipherText(fixedRange);
 
     cout << endl
@@ -147,10 +192,72 @@ void oneTimePadEncryption() {
     cout << "C1: ";
     printIntVector(fixedRange);
 
-    cout << "(C) Ciphertext: " << cipherText;
+    cout << "C (Ciphertext) : " << cipherText;
 }
 
-void oneTimePadDecryption() {
+int oneTimePadDecryption() {
+    string cipherTextInput = "", keyInput = "";
+
+    // user input for ciphertext
+    cout << "Enter the Ciphertext: ";
+    getline(cin, cipherTextInput);
+
+    while (cipherTextInput.empty()) {
+        getline(cin, cipherTextInput);
+    }
+
+    // user input for key
+    cout << "Enter the key: ";
+    getline(cin, keyInput);
+
+    string cipherText = removeSpaces(toLowerCase(cipherTextInput));
+    string key = removeSpaces(toLowerCase(keyInput));
+
+    if (cipherText.length() == 0 || key.length() == 0) {
+        cout << "Ciphertext and key both required." << endl;
+        return 0;
+    }
+
+    // if the plain text's length is greater than key's length, then the key will be repeated
+    if (key.length() < cipherText.length()) {
+        for (int i = 0; i < cipherText.length(); i++) {
+            // checking if the key string is full with repeated string
+            if (key.length() > cipherText.length()) break;
+            key += key;
+        }
+    }
+
+    // slicing out the overflow string from key, exact key length will be plain text's length
+    key = key.substr(0, cipherText.length());
+
+    // get alphabet number from the string
+    vector<int> cipherTextNum = getAlphabetNumber(cipherText), keyNum = getAlphabetNumber(key);
+
+    // get summation of plain text vector and key text vector
+    vector<int> summation = vectorSub(cipherTextNum, keyNum);
+
+    // handling overflow and underflow
+    vector<int> fixedRange = rangeFixer(summation);
+
+    // getting final plaintext
+    string plainText = getCipherText(fixedRange);
+
+    cout << endl
+         << "C: " << cipherText << endl;
+    cout << "C1: ";
+    printIntVector(cipherTextNum);
+
+    cout << "K: " << key << endl;
+    cout << "K1: ";
+    printIntVector(keyNum);
+
+    cout << "Pi: ";
+    printIntVector(summation);
+
+    cout << "P1: ";
+    printIntVector(fixedRange);
+
+    cout << "P (Plain text) : " << plainText;
 }
 
 int main() {
@@ -165,9 +272,6 @@ int main() {
         cout << endl;
     } catch (const exception& e) {
         cerr << e.what() << endl;
-    }
-
-    if (choice > 2 || choice < 1) {
     }
 
     switch (choice) {
