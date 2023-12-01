@@ -2,7 +2,6 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <limits>
 #include <string>
 #include <vector>
 using namespace std;
@@ -21,7 +20,7 @@ string toLowerCase(string text) {
 }
 
 string removeSpaces(string str) {
-    std::string result;
+    string result;
 
     for (char c : str) {
         if (c != ' ') {
@@ -233,11 +232,11 @@ int oneTimePadDecryption() {
     // get alphabet number from the string
     vector<int> cipherTextNum = getAlphabetNumber(cipherText), keyNum = getAlphabetNumber(key);
 
-    // get summation of plain text vector and key text vector
-    vector<int> summation = vectorSub(cipherTextNum, keyNum);
+    // get subtraction of plain text vector and key text vector
+    vector<int> subtraction = vectorSub(cipherTextNum, keyNum);
 
     // handling overflow and underflow
-    vector<int> fixedRange = rangeFixer(summation);
+    vector<int> fixedRange = rangeFixer(subtraction);
 
     // getting final plaintext
     string plainText = getCipherText(fixedRange);
@@ -252,7 +251,7 @@ int oneTimePadDecryption() {
     printIntVector(keyNum);
 
     cout << "Pi: ";
-    printIntVector(summation);
+    printIntVector(subtraction);
 
     cout << "P1: ";
     printIntVector(fixedRange);
